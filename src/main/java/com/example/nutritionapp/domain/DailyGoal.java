@@ -1,11 +1,12 @@
 package com.example.nutritionapp.domain;
 
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.GenericGenerator;
 
+import javax.persistence.*;
 import java.util.UUID;
 
 @Entity
@@ -16,7 +17,8 @@ import java.util.UUID;
 @NoArgsConstructor
 public class DailyGoal {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue(generator = "UUID")
+    @GenericGenerator(name = "uuid", strategy = "uuid2")
     private UUID id;
     private UUID userId;
     private Double bmi;

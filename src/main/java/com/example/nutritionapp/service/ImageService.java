@@ -3,6 +3,8 @@ package com.example.nutritionapp.service;
 import com.example.nutritionapp.http.response.MinioObjectResponse;
 import com.jlefebure.spring.boot.minio.MinioService;
 import io.minio.MinioClient;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;

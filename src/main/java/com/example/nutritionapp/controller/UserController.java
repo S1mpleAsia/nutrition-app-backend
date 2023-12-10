@@ -5,10 +5,10 @@ import com.example.nutritionapp.http.request.InitAccountRequest;
 import com.example.nutritionapp.http.request.UserInfoRequest;
 import com.example.nutritionapp.http.response.GeneralResponse;
 import com.example.nutritionapp.service.UserService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.UUID;
 
 @RestController

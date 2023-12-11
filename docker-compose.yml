@@ -7,6 +7,9 @@ services:
     environment:
       MYSQL_DATABASE: nutrition_app
       MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: root
+      MYSQL_PASSWORD:
+      MYSQL_ALLOW_EMPTY_PASSWORD: true
     ports:
       - '3306:3306'
     expose:

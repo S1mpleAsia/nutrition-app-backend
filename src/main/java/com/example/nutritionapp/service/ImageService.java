@@ -1,6 +1,7 @@
 package com.example.nutritionapp.service;
 
 import com.example.nutritionapp.http.response.MinioObjectResponse;
+import com.example.nutritionapp.utils.IPAddressUtil;
 import com.jlefebure.spring.boot.minio.MinioService;
 import io.minio.MinioClient;
 import lombok.AllArgsConstructor;
@@ -16,15 +17,15 @@ import java.util.Objects;
 @Service
 @RequiredArgsConstructor
 public class ImageService {
-    private final MinioClient minioClient;
     private final MinioService minioService;
     @Value("${spring.minio.bucket}")
     private String bucketName;
+    @Value("${spring.minio.port}")
+    private String minioPort;
 
     public String getObjectUrl(String objectName) {
         try {
-
-            return minioClient.getObjectUrl(bucketName, objectName);
+            return IPAddressUtil.getIPAddress() + ":" + minioPort + "/" + bucketName + "/" + objectName;
         } catch (Exception e) {
             e.printStackTrace();
             return null;

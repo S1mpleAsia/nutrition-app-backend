@@ -17,8 +17,11 @@ public class DiaryFood {
     @Id
     @GeneratedValue(generator = "uuid2")
     @GenericGenerator(name = "uuid2", strategy = "org.hibernate.id.UUIDGenerator")
+    @Column(length = 16)
     private UUID id;
+    @Column(length = 16)
     private UUID foodId;
+    @Column(length = 16)
     private UUID diaryId;
     private Double amount;
     @Transient

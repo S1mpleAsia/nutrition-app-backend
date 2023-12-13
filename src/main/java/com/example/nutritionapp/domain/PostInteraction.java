@@ -17,8 +17,11 @@ public class PostInteraction {
     @Id
     @GeneratedValue(generator = "uuid2")
     @GenericGenerator(name = "uuid2", strategy = "org.hibernate.id.UUIDGenerator")
+    @Column(length = 16)
     private UUID id;
+    @Column(length = 16)
     private UUID postId;
+    @Column(length = 16)
     private UUID fromUserId;
     private Boolean isLiked;
     @Transient

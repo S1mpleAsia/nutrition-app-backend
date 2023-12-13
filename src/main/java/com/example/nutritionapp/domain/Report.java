@@ -17,10 +17,11 @@ public class Report {
     @Id
     @GeneratedValue(generator = "uuid2")
     @GenericGenerator(name = "uuid2", strategy = "org.hibernate.id.UUIDGenerator")
+    @Column(length = 16)
     private UUID id;
     private UUID userReportId;
     private UUID postId;
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = "TEXT", length = 16)
     private String reason;
     private String status;
     @Transient

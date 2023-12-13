@@ -18,10 +18,12 @@ public class Diary {
     @Id
     @GeneratedValue(generator = "uuid2")
     @GenericGenerator(name = "uuid2", strategy = "org.hibernate.id.UUIDGenerator")
+    @Column(length = 16)
     private UUID id;
     private Date date;
     @Column(columnDefinition = "TEXT")
     private String note;
+    @Column(length = 16)
     private UUID userId;
     @Transient
     private User user;

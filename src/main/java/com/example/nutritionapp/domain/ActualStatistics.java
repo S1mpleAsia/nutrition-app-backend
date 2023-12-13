@@ -18,8 +18,11 @@ public class ActualStatistics {
     @Id
     @GeneratedValue(generator = "uuid2")
     @GenericGenerator(name = "uuid2", strategy = "org.hibernate.id.UUIDGenerator")
+    @Column(length = 16)
     private UUID id;
+    @Column(length = 16)
     private UUID diaryId;
+    @Column(length = 16)
     private UUID goalId;
     private Integer realTdee;
     private Integer realWater;

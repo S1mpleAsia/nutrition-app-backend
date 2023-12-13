@@ -17,8 +17,11 @@ public class DiaryActivity {
     @Id
     @GeneratedValue(generator = "uuid2")
     @GenericGenerator(name = "uuid2", strategy = "org.hibernate.id.UUIDGenerator")
+    @Column(length = 16)
     private UUID id;
+    @Column(length = 16)
     private UUID activityId;
+    @Column(length = 16)
     private UUID diaryId;
     private Double minutes;
     @Transient

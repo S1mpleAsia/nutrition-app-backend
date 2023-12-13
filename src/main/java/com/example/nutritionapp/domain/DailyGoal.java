@@ -19,7 +19,9 @@ public class DailyGoal {
     @Id
     @GeneratedValue(generator = "uuid2")
     @GenericGenerator(name = "uuid2", strategy = "org.hibernate.id.UUIDGenerator")
+    @Column(length = 16)
     private UUID id;
+    @Column(length = 16)
     private UUID userId;
     private Double bmi;
     private Integer tdee;

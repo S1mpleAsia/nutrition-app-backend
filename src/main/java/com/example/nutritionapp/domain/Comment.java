@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -18,6 +19,7 @@ public class Comment {
     @Id
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(name = "uuid", strategy = "uuid2")
+    @Type(type = "uuid-char")
     private UUID id;
     private UUID postId;
     private UUID commentUserId;

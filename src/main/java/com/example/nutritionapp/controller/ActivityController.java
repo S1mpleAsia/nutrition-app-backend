@@ -1,6 +1,8 @@
 package com.example.nutritionapp.controller;
 
 import com.example.nutritionapp.dto.ActivityDTO;
+import com.example.nutritionapp.http.response.GeneralListResponse;
+import com.example.nutritionapp.http.response.GeneralResponse;
 import com.example.nutritionapp.service.ActivityService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -15,18 +17,18 @@ import java.util.UUID;
 public class ActivityController {
     private final ActivityService activityService;
 
-    @GetMapping
-    public List<ActivityDTO> getAllActivity() {
-        return activityService.getAllActivity();
+    @GetMapping("{userId}")
+    public GeneralListResponse<ActivityDTO> getAllActivity(@PathVariable("userId") UUID userId) {
+        return activityService.getAllActivity(userId);
     }
 
     @GetMapping("/{activityId}")
-    public ActivityDTO getActivityDetail(@PathVariable("activityId") UUID activityId) {
-        return activityService.getACtivityDetail(activityId);
+    public GeneralResponse<ActivityDTO> getActivityDetail(@PathVariable("activityId") UUID activityId) {
+        return activityService.getActivityDetail(activityId);
     }
 
-    @PostMapping
-    public void createActivity(@RequestBody ActivityDTO activityDTO) {
-        activityService.createActivity(activityDTO);
+    @PostMapping("{userId}")
+    public GeneralResponse<ActivityDTO> createActivity(@PathVariable("userId") UUID userId, @RequestBody ActivityDTO activityDTO) {
+        return activityService.createActivity(userId, activityDTO);
     }
 }

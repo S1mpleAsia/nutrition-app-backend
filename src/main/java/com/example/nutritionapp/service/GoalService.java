@@ -23,7 +23,7 @@ public class GoalService {
     private final DailyGoalMapper dailyGoalMapper;
     private final UserRepository userRepository;
 
-    public void createGoal(UUID userId, DailyGoalDTO goalRequest) {
+    public GeneralResponse<DailyGoalDTO> createGoal(UUID userId, DailyGoalDTO goalRequest) {
         Optional<User> user = userRepository.findById(userId);
 
         if(user.isEmpty()) throw new InstanceExistedException("Could not found any user");
@@ -36,14 +36,19 @@ public class GoalService {
                 .carbs(goalRequest.getCarbs())
                 .protein(goalRequest.getProtein())
                 .fat(goalRequest.getFat())
+                .user(user.get())
                 .build();
 
-        dailyGoalRepository.save(goal);
+        DailyGoal savedGoal = dailyGoalRepository.save(goal);
+
+        return GeneralResponse.success(dailyGoalMapper.toDto(savedGoal));
     }
 
     public GeneralResponse<DailyGoalDTO> getPersonalGoal(UUID userId) {
         userRepository.findById(userId).orElseThrow(() -> new InstanceNotFoundException("Could not found any user"));
         DailyGoal dailyGoal = dailyGoalRepository.findFirstByUserId(userId);
+
+        if(dailyGoal == null) throw new RuntimeException("Could not find any goal");
 
         return GeneralResponse.success(dailyGoalMapper.toDto(dailyGoal));
     }

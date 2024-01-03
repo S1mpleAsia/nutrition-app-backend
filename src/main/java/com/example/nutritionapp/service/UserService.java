@@ -4,6 +4,7 @@ import com.example.nutritionapp.domain.User;
 import com.example.nutritionapp.dto.UserDTO;
 import com.example.nutritionapp.http.request.InitAccountRequest;
 import com.example.nutritionapp.http.request.UserInfoRequest;
+import com.example.nutritionapp.http.response.GeneralListResponse;
 import com.example.nutritionapp.http.response.GeneralResponse;
 import com.example.nutritionapp.mapper.UserMapper;
 import com.example.nutritionapp.repository.UserRepository;
@@ -12,6 +13,7 @@ import com.example.nutritionapp.utils.type.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -82,6 +84,7 @@ public class UserService {
         User persistUser = User.builder()
                 .username(request.getUsername())
                 .password(request.getPassword())
+                .role(Role.USER.name())
                 .status(AccountStatus.INACTIVE.name())
                 .build();
 
@@ -105,5 +108,19 @@ public class UserService {
         User insertedUser = userRepository.saveAndFlush(persistUser);
 
         return GeneralResponse.success(userMapper.toDto(insertedUser));
+    }
+
+    public GeneralListResponse<UserDTO> getAllUser() {
+        List<User> userList = userRepository.findAllByRole(Role.USER.name());
+        List<UserDTO> response = userMapper.toDtoList(userList);
+
+        return GeneralListResponse.success(response);
+    }
+
+    public GeneralListResponse<UserDTO> getAllBannedUser() {
+        List<User> userList = userRepository.findAllByRoleAndStatus(Role.USER.name(), AccountStatus.BAN.name());
+        List<UserDTO> response = userMapper.toDtoList(userList);
+
+        return GeneralListResponse.success(response);
     }
 }

@@ -17,8 +17,8 @@ public class GoalController {
     private final GoalService goalService;
 
     @PostMapping("/{userId}")
-    public void createGoal(@PathVariable("userId") UUID userId, @RequestBody DailyGoalDTO goalRequest) {
-        goalService.createGoal(userId, goalRequest);
+    public GeneralResponse<DailyGoalDTO> createGoal(@PathVariable("userId") UUID userId, @RequestBody DailyGoalDTO goalRequest) {
+        return goalService.createGoal(userId, goalRequest);
     }
 
     @GetMapping("/{userId}")

@@ -61,19 +61,28 @@ public class FoodService {
     public GeneralResponse<FoodDTO> publishedFood(UUID foodId, FoodApproveRequest request) {
         Food food = foodRepository.findById(foodId).orElseThrow(() -> new RuntimeException("Could not find any food"));
 
-        if(request.getStatus().equals(FoodStatus.PENDING.name())) food.setStatus(FoodStatus.PENDING.name());
-        foodRepository.save(food);
+        if(request.getStatus().equals(FoodStatus.PENDING.name())) {
+            food.setStatus(FoodStatus.PENDING.name());
+            foodRepository.save(food);
+            return GeneralResponse.success(foodMapper.toDto(food));
+        } else {
+            throw new RuntimeException("Status is invalid");
+        }
 
-        return GeneralResponse.success(foodMapper.toDto(food));
     }
 
     public GeneralResponse<FoodDTO> approveFood(UUID foodId, FoodApproveRequest request) {
         Food food = foodRepository.findById(foodId).orElseThrow(() -> new RuntimeException("Could not find any food"));
 
-        if(request.getStatus().equals(FoodStatus.PUBLISHED.name())) food.setStatus(FoodStatus.PUBLISHED.name());
-        else if(request.getStatus().equals(FoodStatus.UNPUBLISHED.name())) food.setStatus(FoodStatus.UNPUBLISHED.name());
-
-        foodRepository.save(food);
+        if(request.getStatus().equals(FoodStatus.PUBLISHED.name())) {
+            food.setStatus(FoodStatus.PUBLISHED.name());
+            foodRepository.save(food);
+        } else if(request.getStatus().equals(FoodStatus.UNPUBLISHED.name())) {
+            food.setStatus(FoodStatus.UNPUBLISHED.name());
+            foodRepository.save(food);
+        } else {
+            throw new RuntimeException("Status is invalid");
+        }
 
         return GeneralResponse.success(foodMapper.toDto(food));
     }

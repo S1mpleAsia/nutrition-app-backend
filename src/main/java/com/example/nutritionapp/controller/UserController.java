@@ -3,12 +3,14 @@ package com.example.nutritionapp.controller;
 import com.example.nutritionapp.dto.UserDTO;
 import com.example.nutritionapp.http.request.InitAccountRequest;
 import com.example.nutritionapp.http.request.UserInfoRequest;
+import com.example.nutritionapp.http.response.GeneralListResponse;
 import com.example.nutritionapp.http.response.GeneralResponse;
 import com.example.nutritionapp.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -51,5 +53,15 @@ public class UserController {
     @DeleteMapping("/{userId}")
     public void deleteUser(@PathVariable("userId") UUID userId) {
         userService.deleteUser(userId);
+    }
+
+    @GetMapping("/all-user")
+    public GeneralListResponse<UserDTO> getAllUser() {
+        return userService.getAllUser();
+    }
+
+    @GetMapping("/ban-user")
+    public GeneralListResponse<UserDTO> getAllBannedUser() {
+        return userService.getAllBannedUser();
     }
 }

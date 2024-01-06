@@ -1,6 +1,7 @@
 package com.example.nutritionapp.controller;
 
 import com.example.nutritionapp.dto.DiaryDTO;
+import com.example.nutritionapp.http.request.DiaryUpdateRequest;
 import com.example.nutritionapp.http.response.GeneralListResponse;
 import com.example.nutritionapp.http.response.GeneralResponse;
 import com.example.nutritionapp.service.DiaryService;
@@ -28,14 +29,13 @@ public class DiaryController {
         return diaryService.getDiaryDetail(userId, diaryId);
     }
 
-    @PutMapping("/{diaryId}")
-    public GeneralResponse<DiaryDTO> updateDiary(@PathVariable("diaryId") UUID diaryId, @RequestBody DiaryDTO diaryUpdatedRequest) {
-//        TODO: Need document
-        return diaryService.updateDiary(diaryId, diaryUpdatedRequest);
+    @PutMapping("/{userId}")
+    public void updateDiary(@PathVariable("userId") UUID userId, @RequestBody DiaryUpdateRequest diaryUpdatedRequest) {
+        diaryService.updateDiary(userId, diaryUpdatedRequest);
     }
 
-    @PostMapping("/{userId}")
-    public GeneralResponse<DiaryDTO> createDiary(@PathVariable("userId") UUID userId, @RequestBody DiaryDTO diaryDTO) {
-        return diaryService.createDiary(userId, diaryDTO);
-    }
+//    @PostMapping("/{userId}")
+//    public GeneralResponse<DiaryDTO> createDiary(@PathVariable("userId") UUID userId, @RequestBody DiaryDTO diaryDTO) {
+//        return diaryService.createDiary(userId, diaryDTO);
+//    }
 }

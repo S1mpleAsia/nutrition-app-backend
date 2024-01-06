@@ -1,6 +1,7 @@
 package com.example.nutritionapp.domain;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
@@ -12,6 +13,7 @@ import java.util.UUID;
 @Entity
 @Table(name = "actual_stats")
 @Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class ActualStatistics {
@@ -24,11 +26,11 @@ public class ActualStatistics {
     private UUID diaryId;
     @Column(length = 16)
     private UUID goalId;
-    private Integer realTdee;
-    private Integer realWater;
-    private Integer realProtein;
-    private Integer realFat;
-    private Integer realCarbs;
+    private Double realTdee;
+    private Double realWater;
+    private Double realProtein;
+    private Double realFat;
+    private Double realCarbs;
     private Date day;
     @Transient
     private Diary diary;

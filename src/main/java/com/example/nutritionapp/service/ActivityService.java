@@ -13,7 +13,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -24,8 +27,14 @@ public class ActivityService {
 
     public GeneralListResponse<ActivityDTO> getAllActivity(UUID userId) {
         List<Activity> activityList = activityRepository.findAllByUserId(userId);
+        List<Activity> unpublishedList = activityList.stream().filter(activity ->
+                Objects.equals(activity.getStatus(), ActivityStatus.UNPUBLISHED.name())).toList();
 
-        return GeneralListResponse.success(activityMapper.toDtoList(activityList));
+        List<Activity> publishedList = activityRepository.findAllByStatus(ActivityStatus.PUBLISHED.name());
+
+        List<Activity> result = Stream.concat(unpublishedList.stream(), publishedList.stream()).toList();
+
+        return GeneralListResponse.success(activityMapper.toDtoList(result));
     }
 
     public GeneralResponse<ActivityDTO> getActivityDetail(UUID activityId) {

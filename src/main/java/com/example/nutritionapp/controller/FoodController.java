@@ -18,12 +18,12 @@ import java.util.UUID;
 public class FoodController {
     private final FoodService foodService;
 
-    @GetMapping
-    public GeneralListResponse<FoodDTO> getFoodList() {
-        return foodService.getFoodList();
+    @GetMapping("{userId}")
+    public GeneralListResponse<FoodDTO> getFoodList(@PathVariable String userId) {
+        return foodService.getFoodList(userId);
     }
 
-    @GetMapping("{foodId}")
+    @GetMapping("/detail/{foodId}")
     public GeneralResponse<FoodDTO> getFoodDetail(@PathVariable("foodId") UUID foodId) {
         return foodService.getFoodDetail(foodId);
     }

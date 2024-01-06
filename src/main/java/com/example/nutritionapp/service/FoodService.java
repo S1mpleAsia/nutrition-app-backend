@@ -16,7 +16,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -25,8 +27,9 @@ public class FoodService {
     private final UserRepository userRepository;
     private final FoodMapper foodMapper;
 
-    public GeneralListResponse<FoodDTO> getFoodList() {
+    public GeneralListResponse<FoodDTO> getFoodList(String userId) {
         List<Food> foodList = foodRepository.findAll();
+
 
         return GeneralListResponse.success(foodMapper.toDtoList(foodList));
     }
@@ -38,8 +41,14 @@ public class FoodService {
     }
 
     public GeneralListResponse<FoodDTO> getFoodListBySearch(String query) {
+        List<Food> foodList = foodRepository.findAll();
+        List<Food> unpublishedList = foodList.stream().filter(food ->
+                Objects.equals(food.getStatus(), FoodStatus.UNPUBLISHED.name())).toList();
+        List<Food> publishedList = foodRepository.findAllByStatus(FoodStatus.PUBLISHED.name());
 
-        return getFoodList();
+        List<Food> result = Stream.concat(unpublishedList.stream(), publishedList.stream()).toList();
+
+        return GeneralListResponse.success(foodMapper.toDtoList(result));
     }
 
     public GeneralResponse<FoodDTO> createFood(FoodDTO request) {

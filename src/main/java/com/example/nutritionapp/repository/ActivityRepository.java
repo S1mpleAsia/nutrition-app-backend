@@ -8,4 +8,5 @@ import java.util.UUID;
 
 public interface ActivityRepository extends JpaRepository<Activity, UUID> {
     List<Activity> findAllByUserId(UUID userId);
+    List<Activity> findAllByStatus(String status);
 }

@@ -22,7 +22,7 @@ public class ActivityController {
         return activityService.getAllActivity(userId);
     }
 
-    @GetMapping("/{activityId}")
+    @GetMapping("/detail/{activityId}")
     public GeneralResponse<ActivityDTO> getActivityDetail(@PathVariable("activityId") UUID activityId) {
         return activityService.getActivityDetail(activityId);
     }

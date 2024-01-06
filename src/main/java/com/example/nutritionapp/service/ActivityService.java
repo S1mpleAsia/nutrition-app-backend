@@ -30,9 +30,12 @@ public class ActivityService {
         List<Activity> unpublishedList = activityList.stream().filter(activity ->
                 Objects.equals(activity.getStatus(), ActivityStatus.UNPUBLISHED.name())).toList();
 
+        List<Activity> pendingList = activityRepository.findAllByUserIdAndStatus(userId, ActivityStatus.PENDING.name());
         List<Activity> publishedList = activityRepository.findAllByStatus(ActivityStatus.PUBLISHED.name());
 
-        List<Activity> result = Stream.concat(unpublishedList.stream(), publishedList.stream()).toList();
+        List<Activity> result = Stream.concat(
+                Stream.concat(unpublishedList.stream(), pendingList.stream()),
+                publishedList.stream()).toList();
 
         return GeneralListResponse.success(activityMapper.toDtoList(result));
     }

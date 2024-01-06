@@ -8,5 +8,6 @@ import java.util.UUID;
 
 public interface FoodRepository extends JpaRepository<Food, UUID> {
     List<Food> findAllByUserId(UUID userId);
+    List<Food> findAllByUserIdAndStatus(UUID userId, String status);
     List<Food> findAllByStatus(String status);
 }

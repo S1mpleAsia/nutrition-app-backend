@@ -19,7 +19,7 @@ public class FoodController {
     private final FoodService foodService;
 
     @GetMapping("{userId}")
-    public GeneralListResponse<FoodDTO> getFoodList(@PathVariable String userId) {
+    public GeneralListResponse<FoodDTO> getFoodList(@PathVariable UUID userId) {
         return foodService.getFoodList(userId);
     }
 

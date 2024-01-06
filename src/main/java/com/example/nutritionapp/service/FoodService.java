@@ -27,11 +27,21 @@ public class FoodService {
     private final UserRepository userRepository;
     private final FoodMapper foodMapper;
 
-    public GeneralListResponse<FoodDTO> getFoodList(String userId) {
-        List<Food> foodList = foodRepository.findAll();
+    public GeneralListResponse<FoodDTO> getFoodList(UUID userId) {
+        List<Food> foodList = foodRepository.findAllByUserId(userId);
+        List<Food> unpublishedList = foodList.stream().filter(food ->
+                Objects.equals(food.getStatus(), FoodStatus.UNPUBLISHED.name())).toList();
 
+        List<Food> pendingList = foodRepository.findAllByUserIdAndStatus(userId, FoodStatus.PENDING.name());
 
-        return GeneralListResponse.success(foodMapper.toDtoList(foodList));
+        List<Food> publishedList = foodRepository.findAllByStatus(FoodStatus.PUBLISHED.name());
+
+        List<Food> result = Stream.concat(
+                        Stream.concat(unpublishedList.stream(), pendingList.stream()),
+                        publishedList.stream())
+                .toList();
+
+        return GeneralListResponse.success(foodMapper.toDtoList(result));
     }
 
     public GeneralResponse<FoodDTO> getFoodDetail(UUID foodId) {
@@ -42,13 +52,8 @@ public class FoodService {
 
     public GeneralListResponse<FoodDTO> getFoodListBySearch(String query) {
         List<Food> foodList = foodRepository.findAll();
-        List<Food> unpublishedList = foodList.stream().filter(food ->
-                Objects.equals(food.getStatus(), FoodStatus.UNPUBLISHED.name())).toList();
-        List<Food> publishedList = foodRepository.findAllByStatus(FoodStatus.PUBLISHED.name());
 
-        List<Food> result = Stream.concat(unpublishedList.stream(), publishedList.stream()).toList();
-
-        return GeneralListResponse.success(foodMapper.toDtoList(result));
+        return GeneralListResponse.success(foodMapper.toDtoList(foodList));
     }
 
     public GeneralResponse<FoodDTO> createFood(FoodDTO request) {

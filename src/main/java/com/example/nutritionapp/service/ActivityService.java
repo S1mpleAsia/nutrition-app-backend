@@ -1,14 +1,17 @@
 package com.example.nutritionapp.service;
 
 import com.example.nutritionapp.domain.Activity;
+import com.example.nutritionapp.domain.User;
 import com.example.nutritionapp.dto.ActivityDTO;
 import com.example.nutritionapp.exception.impl.InstanceNotFoundException;
+import com.example.nutritionapp.http.request.FoodApproveRequest;
 import com.example.nutritionapp.http.response.GeneralListResponse;
 import com.example.nutritionapp.http.response.GeneralResponse;
 import com.example.nutritionapp.mapper.ActivityMapper;
 import com.example.nutritionapp.repository.ActivityRepository;
 import com.example.nutritionapp.repository.UserRepository;
 import com.example.nutritionapp.utils.type.ActivityStatus;
+import com.example.nutritionapp.utils.type.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -47,18 +50,55 @@ public class ActivityService {
         return GeneralResponse.success(activityMapper.toDto(activity));
     }
 
-    public GeneralResponse<ActivityDTO> createActivity(UUID userId, ActivityDTO activityDTO) {
-        userRepository.findById(userId).orElseThrow(() -> new RuntimeException("Could not found any user"));
+    public GeneralResponse<ActivityDTO> createActivity(ActivityDTO request) {
+        User user = userRepository.findById(request.getUserId()).orElseThrow(() -> new RuntimeException("Could not found any user"));
 
-        Activity activity = Activity.builder()
-                .name(activityDTO.getName())
-                .caloriesConsume(activityDTO.getCaloriesConsume())
-                .userId(userId)
-                .status(ActivityStatus.UNPUBLISHED.name())
-                .build();
+        Activity activity = activityMapper.toEntity(request);
 
-        Activity savedActivity = activityRepository.save(activity);
+        if(user.getRole().equals(Role.USER.name())) {
+            activity.setStatus(ActivityStatus.UNPUBLISHED.name());
+        } else if (user.getRole().equals(Role.ADMIN.name())) {
+            activity.setStatus(ActivityStatus.PUBLISHED.name());
+        }
 
-        return GeneralResponse.success(activityMapper.toDto(savedActivity));
+        Activity insertedActivity = activityRepository.saveAndFlush(activity);
+
+        return GeneralResponse.success(activityMapper.toDto(insertedActivity));
+    }
+
+    public GeneralResponse<ActivityDTO> approveFood(UUID activityId, FoodApproveRequest request) {
+        Activity activity = activityRepository.findById(activityId).orElseThrow(() -> new RuntimeException("Could not find any food"));
+
+        if(request.getStatus().equals(ActivityStatus.PUBLISHED.name())) {
+            activity.setStatus(ActivityStatus.PUBLISHED.name());
+            activityRepository.save(activity);
+        } else if (request.getStatus().equals(ActivityStatus.UNPUBLISHED.name())) {
+            activity.setStatus(ActivityStatus.UNPUBLISHED.name());
+            activityRepository.save(activity);
+        } else {
+            throw new RuntimeException("Status is invalid");
+        }
+
+        return GeneralResponse.success(activityMapper.toDto(activity));
+    }
+
+    public void deleteActivity(UUID activityId) {
+        Activity activity = activityRepository.findById(activityId).orElseThrow(() -> new RuntimeException("Could not find any activity"));
+
+        activityRepository.delete(activity);
+    }
+
+    public GeneralListResponse<ActivityDTO> getPendingListActivity() {
+        List<Activity> activityList = activityRepository.findAllByStatus(ActivityStatus.PENDING.name());
+
+        return GeneralListResponse.success(activityMapper.toDtoList(activityList));
+    }
+
+    public GeneralResponse<ActivityDTO> updateActivity(UUID activityId, ActivityDTO activityDTO) {
+        Activity activity = activityRepository.findById(activityId).orElseThrow(() -> new RuntimeException("Could not find any activity"));
+
+        activityRepository.save(activity);
+
+        return GeneralResponse.success(activityMapper.toDto(activity));
     }
 }

@@ -1,6 +1,7 @@
 package com.example.nutritionapp.controller;
 
 import com.example.nutritionapp.dto.ActivityDTO;
+import com.example.nutritionapp.http.request.FoodApproveRequest;
 import com.example.nutritionapp.http.response.GeneralListResponse;
 import com.example.nutritionapp.http.response.GeneralResponse;
 import com.example.nutritionapp.service.ActivityService;
@@ -27,8 +28,28 @@ public class ActivityController {
         return activityService.getActivityDetail(activityId);
     }
 
-    @PostMapping("{userId}")
-    public GeneralResponse<ActivityDTO> createActivity(@PathVariable("userId") UUID userId, @RequestBody ActivityDTO activityDTO) {
-        return activityService.createActivity(userId, activityDTO);
+    @PostMapping()
+    public GeneralResponse<ActivityDTO> createActivity(@RequestBody ActivityDTO request) {
+        return activityService.createActivity(request);
+    }
+
+    @PutMapping("approve/{activityId}")
+    public GeneralResponse<ActivityDTO> approveActivity(@PathVariable("activityId") UUID activityId, @RequestBody FoodApproveRequest request) {
+        return activityService.approveFood(activityId, request);
+    }
+
+    @DeleteMapping("{activityId}")
+    public void deleteActivity(@PathVariable("activityId") UUID activityId) {
+        activityService.deleteActivity(activityId);
+    }
+
+    @GetMapping("public")
+    public GeneralListResponse<ActivityDTO> getPendingActivity() {
+        return activityService.getPendingListActivity();
+    }
+
+    @PostMapping("{activityId}")
+    public GeneralResponse<ActivityDTO> updateActivity(@PathVariable("activityId") UUID activityId,@RequestBody ActivityDTO activityDTO ) {
+        return activityService.updateActivity(activityId, activityDTO);
     }
 }

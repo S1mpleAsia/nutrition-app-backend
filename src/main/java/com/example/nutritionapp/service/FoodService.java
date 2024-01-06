@@ -79,6 +79,11 @@ public class FoodService {
             food.setStatus(FoodStatus.PENDING.name());
             foodRepository.save(food);
             return GeneralResponse.success(foodMapper.toDto(food));
+        } else if (request.getStatus().equals(FoodStatus.UNPUBLISHED.name())) {
+            food.setStatus(FoodStatus.UNPUBLISHED.name());
+            foodRepository.save(food);
+
+            return GeneralResponse.success(foodMapper.toDto(food));
         } else {
             throw new RuntimeException("Status is invalid");
         }

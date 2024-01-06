@@ -1,12 +1,16 @@
 package com.example.nutritionapp.service;
 
+import com.example.nutritionapp.domain.DailyGoal;
 import com.example.nutritionapp.domain.User;
 import com.example.nutritionapp.dto.UserDTO;
 import com.example.nutritionapp.http.request.InitAccountRequest;
 import com.example.nutritionapp.http.request.UserInfoRequest;
 import com.example.nutritionapp.http.response.GeneralListResponse;
 import com.example.nutritionapp.http.response.GeneralResponse;
+import com.example.nutritionapp.http.response.UserResponse;
+import com.example.nutritionapp.mapper.DailyGoalMapper;
 import com.example.nutritionapp.mapper.UserMapper;
+import com.example.nutritionapp.repository.DailyGoalRepository;
 import com.example.nutritionapp.repository.UserRepository;
 import com.example.nutritionapp.utils.type.AccountStatus;
 import com.example.nutritionapp.utils.type.Role;
@@ -20,7 +24,10 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+    private final DailyGoalRepository dailyGoalRepository;
     private final UserMapper userMapper;
+    private final DailyGoalMapper dailyGoalMapper;
+
     public UserDTO signUp(UserDTO userDTO) {
         User user = userMapper.toEntity(userDTO);
         User savedUser = userRepository.save(user);
@@ -65,10 +72,16 @@ public class UserService {
         return GeneralResponse.success(userMapper.toDto(user));
     }
 
-    public GeneralResponse<UserDTO> viewProfile(UUID userId) {
+    public GeneralResponse<UserResponse> viewProfile(UUID userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("Could not find any user"));
+        DailyGoal dailyGoal = dailyGoalRepository.findFirstByUserId(userId);
 
-        return GeneralResponse.success(userMapper.toDto(user));
+        UserResponse response = UserResponse.builder()
+                .profile(userMapper.toDto(user))
+                .dailyGoal(dailyGoalMapper.toDto(dailyGoal))
+                .build();
+
+        return GeneralResponse.success(response);
     }
 
     public void deleteUser(UUID userId) {

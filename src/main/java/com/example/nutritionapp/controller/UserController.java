@@ -5,6 +5,7 @@ import com.example.nutritionapp.http.request.InitAccountRequest;
 import com.example.nutritionapp.http.request.UserInfoRequest;
 import com.example.nutritionapp.http.response.GeneralListResponse;
 import com.example.nutritionapp.http.response.GeneralResponse;
+import com.example.nutritionapp.http.response.UserResponse;
 import com.example.nutritionapp.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -46,7 +47,7 @@ public class UserController {
     }
 
     @GetMapping("/{userId}/profile")
-    public GeneralResponse<UserDTO> viewProfile(@PathVariable("userId") UUID userId) {
+    public GeneralResponse<UserResponse> viewProfile(@PathVariable("userId") UUID userId) {
         return userService.viewProfile(userId);
     }
 

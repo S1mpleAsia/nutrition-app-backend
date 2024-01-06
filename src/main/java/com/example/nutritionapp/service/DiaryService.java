@@ -2,7 +2,6 @@ package com.example.nutritionapp.service;
 
 import com.example.nutritionapp.domain.*;
 import com.example.nutritionapp.dto.DiaryDTO;
-import com.example.nutritionapp.dto.FoodDTO;
 import com.example.nutritionapp.exception.impl.InstanceNotFoundException;
 import com.example.nutritionapp.http.request.DiaryUpdateRequest;
 import com.example.nutritionapp.http.response.DiaryUpdateResponse;
@@ -14,16 +13,16 @@ import com.example.nutritionapp.mapper.FoodMapper;
 import com.example.nutritionapp.repository.*;
 import com.example.nutritionapp.utils.DateTransform;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
-import javax.swing.text.html.Option;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class DiaryService {
     private final DiaryRepository diaryRepository;
     private final DiaryFoodRepository diaryFoodRepository;
@@ -142,7 +141,7 @@ public class DiaryService {
         } else {
             DiaryFood myDiaryFood = diaryFood.get();
 
-            myDiaryFood.setAmount(diaryUpdatedRequest.getFoodAmount());
+            myDiaryFood.setAmount(diaryUpdatedRequest.getFoodAmount() + myDiaryFood.getAmount());
             diaryFoodRepository.save(myDiaryFood);
         }
     }
@@ -163,7 +162,7 @@ public class DiaryService {
         } else {
             DiaryActivity myDiaryActivity = diaryActivity.get();
 
-            myDiaryActivity.setMinutes(diaryUpdatedRequest.getActivityUnit());
+            myDiaryActivity.setMinutes(diaryUpdatedRequest.getActivityUnit() + myDiaryActivity.getMinutes());
             diaryActivityRepository.save(myDiaryActivity);
         }
     }
@@ -171,12 +170,8 @@ public class DiaryService {
     private void updateActualStatistics(UUID diaryId, DiaryUpdateRequest diaryUpdateRequest) {
         Optional<ActualStatistics> actualStatistics = actualStatisticsRepository.findFirstByDiaryId(diaryId);
         List<Food> foodList = foodRepository.findAll();
-        List<Activity> activityList = activityRepository.findAll();
 
         Map<UUID, Food> foodMap = foodList.stream().collect(Collectors.toMap(Food::getId, Function.identity()));
-        Map<UUID, Activity> activityMap = activityList.stream().collect(Collectors.toMap(Activity::getId, Function.identity()));
-
-        List<DiaryActivity> diaryActivities = diaryActivityRepository.findAllByDiaryId(diaryId);
         List<DiaryFood> diaryFoods = diaryFoodRepository.findAllByDiaryId(diaryId);
 
         double realCarbs = 0.0;
@@ -194,6 +189,7 @@ public class DiaryService {
         }
 
         if(actualStatistics.isEmpty()) {
+            log.info("Water: [{}]", diaryUpdateRequest.getWater());
             ActualStatistics statistics = ActualStatistics.builder()
                     .diaryId(diaryId)
                     .realWater(diaryUpdateRequest.getWater() == null ? 0 : 1.0 * diaryUpdateRequest.getWater())
@@ -206,8 +202,9 @@ public class DiaryService {
             actualStatisticsRepository.save(statistics);
         } else {
             ActualStatistics statistics = actualStatistics.get();
+            log.info("Water: [{}]", statistics.getRealWater());
 
-            statistics.setRealWater(actualStatistics.get().getRealWater() == null ? 0 : 1.0 * actualStatistics.get().getRealWater());
+            statistics.setRealWater(statistics.getRealWater() == null ? 0 : 1.0 * statistics.getRealWater());
             statistics.setRealCarbs(realCarbs);
             statistics.setRealFat(realFat);
             statistics.setRealProtein(realProtein);

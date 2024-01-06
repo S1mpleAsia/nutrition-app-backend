@@ -207,7 +207,7 @@ public class DiaryService {
         } else {
             ActualStatistics statistics = actualStatistics.get();
 
-            statistics.setRealWater(diaryUpdateRequest.getWater() == null ? 0 : 1.0 * diaryUpdateRequest.getWater());
+            statistics.setRealWater(actualStatistics.get().getRealWater() == null ? 0 : 1.0 * actualStatistics.get().getRealWater());
             statistics.setRealCarbs(realCarbs);
             statistics.setRealFat(realFat);
             statistics.setRealProtein(realProtein);

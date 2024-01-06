@@ -189,7 +189,6 @@ public class DiaryService {
         }
 
         if(actualStatistics.isEmpty()) {
-            log.info("Water: [{}]", diaryUpdateRequest.getWater());
             ActualStatistics statistics = ActualStatistics.builder()
                     .diaryId(diaryId)
                     .realWater(diaryUpdateRequest.getWater() == null ? 0 : 1.0 * diaryUpdateRequest.getWater())
@@ -202,9 +201,15 @@ public class DiaryService {
             actualStatisticsRepository.save(statistics);
         } else {
             ActualStatistics statistics = actualStatistics.get();
-            log.info("Water: [{}]", statistics.getRealWater());
 
-            statistics.setRealWater(statistics.getRealWater() == null ? 0 : 1.0 * statistics.getRealWater());
+            Double water = 0.0;
+            if(diaryUpdateRequest.getActivityId() != null || diaryUpdateRequest.getFoodId() != null) {
+                water = statistics.getRealWater();
+            } else if(diaryUpdateRequest.getWater() != null){
+                water = 1.0 * diaryUpdateRequest.getWater();
+            }
+
+            statistics.setRealWater(water);
             statistics.setRealCarbs(realCarbs);
             statistics.setRealFat(realFat);
             statistics.setRealProtein(realProtein);

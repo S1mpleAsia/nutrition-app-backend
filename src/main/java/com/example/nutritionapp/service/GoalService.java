@@ -28,6 +28,9 @@ public class GoalService {
 
         if(user.isEmpty()) throw new InstanceExistedException("Could not found any user");
 
+        DailyGoal dailyGoal = dailyGoalRepository.findFirstByUserId(userId);
+        if(dailyGoal != null) return GeneralResponse.success(dailyGoalMapper.toDto(dailyGoal));
+
         DailyGoal goal = DailyGoal.builder()
                 .userId(userId)
                 .bmi(goalRequest.getBmi())

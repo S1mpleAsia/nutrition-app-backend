@@ -2,6 +2,7 @@ package com.example.nutritionapp.controller;
 
 import com.example.nutritionapp.dto.DiaryDTO;
 import com.example.nutritionapp.http.request.DiaryUpdateRequest;
+import com.example.nutritionapp.http.response.DiaryUpdateResponse;
 import com.example.nutritionapp.http.response.GeneralListResponse;
 import com.example.nutritionapp.http.response.GeneralResponse;
 import com.example.nutritionapp.service.DiaryService;
@@ -25,8 +26,8 @@ public class DiaryController {
 
 
     @GetMapping("/{userId}/detail")
-    public GeneralResponse<DiaryDTO> getDiaryDetail(@PathVariable("userId") UUID userId, @RequestParam("diaryId") UUID diaryId) {
-        return diaryService.getDiaryDetail(userId, diaryId);
+    public GeneralResponse<DiaryUpdateResponse> getDiaryDetail(@PathVariable("userId") UUID userId, @RequestParam("date") String dateString) {
+        return diaryService.getDiaryDetail(userId, dateString);
     }
 
     @PutMapping("/{userId}")

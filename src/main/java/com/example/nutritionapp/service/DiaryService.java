@@ -2,17 +2,22 @@ package com.example.nutritionapp.service;
 
 import com.example.nutritionapp.domain.*;
 import com.example.nutritionapp.dto.DiaryDTO;
+import com.example.nutritionapp.dto.FoodDTO;
 import com.example.nutritionapp.exception.impl.InstanceNotFoundException;
 import com.example.nutritionapp.http.request.DiaryUpdateRequest;
+import com.example.nutritionapp.http.response.DiaryUpdateResponse;
 import com.example.nutritionapp.http.response.GeneralListResponse;
 import com.example.nutritionapp.http.response.GeneralResponse;
+import com.example.nutritionapp.mapper.ActivityMapper;
 import com.example.nutritionapp.mapper.DiaryMapper;
+import com.example.nutritionapp.mapper.FoodMapper;
 import com.example.nutritionapp.repository.*;
 import com.example.nutritionapp.utils.DateTransform;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import javax.swing.text.html.Option;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -28,6 +33,8 @@ public class DiaryService {
     private final FoodRepository foodRepository;
     private final ActivityRepository activityRepository;
     private final DiaryMapper diaryMapper;
+    private final FoodMapper foodMapper;
+    private final ActivityMapper activityMapper;
 
     public GeneralListResponse<DiaryDTO> getListDiary(UUID userId) {
         List<Diary> diaryList = diaryRepository.findAllByUserId(userId);
@@ -35,12 +42,54 @@ public class DiaryService {
         return GeneralListResponse.success(diaryMapper.toDtoList(diaryList));
     }
 
-    public GeneralResponse<DiaryDTO> getDiaryDetail(UUID userId, UUID diaryId) {
-        userRepository.findById(userId).orElseThrow(() -> new InstanceNotFoundException("Can not found user"));
+    public GeneralResponse<DiaryUpdateResponse> getDiaryDetail(UUID userId, String dateString) {
+        Date date = DateTransform.toDate(dateString);
+        Optional<Diary> diary = diaryRepository.findFirstByUserIdAndDate(userId, date);
+        DiaryUpdateResponse diaryUpdateResponse = new DiaryUpdateResponse();
 
-        Diary diary = diaryRepository.findById(diaryId).orElseThrow(() -> new InstanceNotFoundException("Can not found diary"));
+        if(diary.isEmpty()) return GeneralResponse.error("Can not find diary", diaryUpdateResponse);
 
-        return GeneralResponse.success(diaryMapper.toDto(diary));
+        else {
+            Optional<ActualStatistics> statisticsOptional = actualStatisticsRepository.findFirstByDiaryId(diary.get().getId());
+
+            if(statisticsOptional.isEmpty()) return GeneralResponse.error("No statistics", new DiaryUpdateResponse());
+            diaryUpdateResponse.setStatistics(statisticsOptional.get());
+
+            setFoodResponse(diaryUpdateResponse, diary);
+            setActivityResponse(diaryUpdateResponse, diary);
+
+            return GeneralResponse.success(diaryUpdateResponse);
+        }
+    }
+
+    private void setFoodResponse(DiaryUpdateResponse diaryUpdateResponse, Optional<Diary> diary) {
+        List<Food> foodList = foodRepository.findAll();
+        Map<UUID, Food> foodMap = foodList.stream().collect(Collectors.toMap(Food::getId, Function.identity()));
+        List<DiaryFood> diaryFoodList = diaryFoodRepository.findAllByDiaryId(diary.get().getId());
+        List<Food> foodResponse = new ArrayList<>();
+
+        diaryFoodList.forEach(item -> {
+            foodResponse.add(foodMap.get(item.getFoodId()));
+        });
+
+        diaryUpdateResponse.setFoodList(foodMapper.toDtoList(foodResponse));
+    }
+
+    private void setActivityResponse(DiaryUpdateResponse diaryUpdateResponse, Optional<Diary> diary) {
+        List<Activity> activityList = activityRepository.findAll();
+        Map<UUID, Activity> activityMap = activityList.stream().collect(Collectors.toMap(Activity::getId, Function.identity()));
+        List<DiaryActivity> diaryActivityList = diaryActivityRepository.findAllByDiaryId(diary.get().getId());
+        double totalConsumes = 0.0;
+        List<Activity> activityResponse = new ArrayList<>();
+
+        for(DiaryActivity diaryActivity : diaryActivityList) {
+            Activity activity = activityMap.get(diaryActivity.getActivityId());
+            activityResponse.add(activityMap.get(diaryActivity.getActivityId()));
+            totalConsumes += (diaryActivity.getMinutes() / 30) * activity.getCaloriesConsume();
+        }
+
+        diaryUpdateResponse.setActivityList(activityMapper.toDtoList(activityResponse));
+        diaryUpdateResponse.setTotalConsumes(totalConsumes);
     }
 
     public void updateDiary(UUID userId, DiaryUpdateRequest diaryUpdatedRequest) {

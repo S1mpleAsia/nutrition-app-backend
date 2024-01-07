@@ -23,9 +23,7 @@ public class Comment {
     @Column(length = 16)
     private UUID postId;
     @Column(length = 16)
-    private UUID commentUserId;
-    @Column(length = 16)
-    private UUID commentParentId;
+    private UUID commentFromUserId;
     @Column(columnDefinition = "TEXT")
     private String content;
     private Date createdAt;
@@ -35,9 +33,6 @@ public class Comment {
     private Post post;
     @Transient
     private User commentUser;
-    @Transient
-    private User commentParent;
-
     @PrePersist
     public void updateCreateTime() {
         createdAt = new Date();

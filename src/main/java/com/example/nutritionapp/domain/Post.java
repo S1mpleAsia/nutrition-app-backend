@@ -20,10 +20,10 @@ public class Post {
     @Column(length = 16)
     private UUID id;
     @Column(length = 16)
-    private UUID postUserId;
+    private UUID diaryId;
     @Column(columnDefinition = "TEXT")
     private String content;
     private String image;
     @Transient
-    private User postUser;
+    private Diary diary;
 }

@@ -14,8 +14,8 @@ import java.util.UUID;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class PostDTO {
     private UUID id;
-    private UUID postUserId;
+    private UUID diaryId;
     private String content;
     private String image;
-    private UserDTO postUser;
+    private DiaryDTO diary;
 }

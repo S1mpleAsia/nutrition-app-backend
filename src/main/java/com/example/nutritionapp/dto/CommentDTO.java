@@ -1,6 +1,5 @@
 package com.example.nutritionapp.dto;
 
-import com.example.nutritionapp.domain.Post;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 
@@ -17,13 +16,11 @@ import java.util.UUID;
 public class CommentDTO {
     private UUID id;
     private UUID postId;
-    private UUID commentUserId;
-    private UUID commentParentId;
+    private UUID commentFromUserId;
     private String content;
     private Date createdAt;
     private Date updatedAt;
     private String status;
-    private Post post;
+    private PostDTO post;
     private UserDTO commentUser;
-    private UserDTO commentParent;
 }

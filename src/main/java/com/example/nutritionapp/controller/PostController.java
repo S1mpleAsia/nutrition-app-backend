@@ -7,12 +7,12 @@ import com.example.nutritionapp.http.request.PostReactionRequest;
 import com.example.nutritionapp.http.request.ReportPostRequest;
 import com.example.nutritionapp.http.response.GeneralListResponse;
 import com.example.nutritionapp.http.response.GeneralResponse;
+import com.example.nutritionapp.http.response.PostDetailResponse;
 import com.example.nutritionapp.http.response.PostResponse;
 import com.example.nutritionapp.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -37,12 +37,12 @@ public class PostController {
     }
 
     @GetMapping
-    public GeneralListResponse<PostDTO> getPostList() {
+    public GeneralListResponse<PostResponse> getPostList() {
         return postService.getPostList();
     }
 
     @GetMapping("{postId}")
-    public GeneralResponse<PostResponse> getPostDetail(@PathVariable("postId") UUID postId) {
+    public GeneralResponse<PostDetailResponse> getPostDetail(@PathVariable("postId") UUID postId) {
         return postService.getPostDetail(postId);
     }
 

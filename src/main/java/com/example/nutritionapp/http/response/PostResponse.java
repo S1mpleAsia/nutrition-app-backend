@@ -1,21 +1,21 @@
 package com.example.nutritionapp.http.response;
 
-import com.example.nutritionapp.dto.CommentDTO;
-import com.example.nutritionapp.dto.PostDTO;
-import com.example.nutritionapp.dto.PostInteractionDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
+import java.util.UUID;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class PostResponse {
-    private PostDTO post;
-    private List<PostInteractionDTO> interaction;
-    private List<CommentDTO> comment;
+    private UUID id;
+    private UUID diaryId;
+    private String content;
+    private String image;
+    private UUID userId;
+    private String username;
 }

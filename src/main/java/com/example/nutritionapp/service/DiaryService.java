@@ -1,12 +1,12 @@
 package com.example.nutritionapp.service;
 
 import com.example.nutritionapp.domain.*;
+import com.example.nutritionapp.dto.ActivityDTO;
 import com.example.nutritionapp.dto.DiaryDTO;
+import com.example.nutritionapp.dto.FoodDTO;
 import com.example.nutritionapp.exception.impl.InstanceNotFoundException;
 import com.example.nutritionapp.http.request.DiaryUpdateRequest;
-import com.example.nutritionapp.http.response.DiaryUpdateResponse;
-import com.example.nutritionapp.http.response.GeneralListResponse;
-import com.example.nutritionapp.http.response.GeneralResponse;
+import com.example.nutritionapp.http.response.*;
 import com.example.nutritionapp.mapper.ActivityMapper;
 import com.example.nutritionapp.mapper.DiaryMapper;
 import com.example.nutritionapp.mapper.FoodMapper;
@@ -46,12 +46,12 @@ public class DiaryService {
         Optional<Diary> diary = diaryRepository.findFirstByUserIdAndDate(userId, date);
         DiaryUpdateResponse diaryUpdateResponse = new DiaryUpdateResponse();
 
-        if(diary.isEmpty()) return GeneralResponse.error("Can not find diary", diaryUpdateResponse);
+        if (diary.isEmpty()) return GeneralResponse.error("Can not find diary", diaryUpdateResponse);
 
         else {
             Optional<ActualStatistics> statisticsOptional = actualStatisticsRepository.findFirstByDiaryId(diary.get().getId());
 
-            if(statisticsOptional.isEmpty()) return GeneralResponse.error("No statistics", new DiaryUpdateResponse());
+            if (statisticsOptional.isEmpty()) return GeneralResponse.error("No statistics", new DiaryUpdateResponse());
             diaryUpdateResponse.setStatistics(statisticsOptional.get());
 
             setFoodResponse(diaryUpdateResponse, diary);
@@ -63,31 +63,64 @@ public class DiaryService {
 
     private void setFoodResponse(DiaryUpdateResponse diaryUpdateResponse, Optional<Diary> diary) {
         List<Food> foodList = foodRepository.findAll();
-        Map<UUID, Food> foodMap = foodList.stream().collect(Collectors.toMap(Food::getId, Function.identity()));
+        List<FoodDTO> foodDTOList = foodMapper.toDtoList(foodList);
+        Map<UUID, FoodDTO> foodMap = foodDTOList.stream().collect(Collectors.toMap(FoodDTO::getId, Function.identity()));
         List<DiaryFood> diaryFoodList = diaryFoodRepository.findAllByDiaryId(diary.get().getId());
-        List<Food> foodResponse = new ArrayList<>();
+        List<FoodResponse> foodResponse = new ArrayList<>();
 
         diaryFoodList.forEach(item -> {
-            foodResponse.add(foodMap.get(item.getFoodId()));
+            FoodDTO foodDTO = foodMap.get(item.getFoodId());
+
+            FoodResponse response = FoodResponse.builder()
+                    .id(foodDTO.getId())
+                    .image(foodDTO.getImage())
+                    .foodName(foodDTO.getFoodName())
+                    .fat(foodDTO.getFat())
+                    .protein(foodDTO.getProtein())
+                    .carbs(foodDTO.getCarbs())
+                    .calories(foodDTO.getCalories())
+                    .status(foodDTO.getStatus())
+                    .unitType(foodDTO.getUnitType())
+                    .userId(foodDTO.getUserId())
+                    .amount(item.getAmount())
+                    .build();
+
+            foodResponse.add(response);
         });
 
-        diaryUpdateResponse.setFoodList(foodMapper.toDtoList(foodResponse));
+        diaryUpdateResponse.setFoodList(foodResponse);
     }
 
     private void setActivityResponse(DiaryUpdateResponse diaryUpdateResponse, Optional<Diary> diary) {
         List<Activity> activityList = activityRepository.findAll();
-        Map<UUID, Activity> activityMap = activityList.stream().collect(Collectors.toMap(Activity::getId, Function.identity()));
+        List<ActivityDTO> activityDTOList = activityMapper.toDtoList(activityList);
+
+        Map<UUID, ActivityDTO> activityMap = activityDTOList.stream().collect(Collectors.toMap(ActivityDTO::getId, Function.identity()));
         List<DiaryActivity> diaryActivityList = diaryActivityRepository.findAllByDiaryId(diary.get().getId());
         double totalConsumes = 0.0;
-        List<Activity> activityResponse = new ArrayList<>();
+        List<ActivityResponse> activityResponse = new ArrayList<>();
 
-        for(DiaryActivity diaryActivity : diaryActivityList) {
-            Activity activity = activityMap.get(diaryActivity.getActivityId());
-            activityResponse.add(activityMap.get(diaryActivity.getActivityId()));
-            totalConsumes += (diaryActivity.getMinutes() / 30) * activity.getCaloriesConsume();
+        for (DiaryActivity diaryActivity : diaryActivityList) {
+            ActivityDTO activity = activityMap.get(diaryActivity.getActivityId());
+
+            double activityConsume = (diaryActivity.getMinutes() / 30) * activity.getCaloriesConsume();
+
+            totalConsumes += activityConsume;
+            ActivityResponse response = ActivityResponse.builder()
+                    .id(activity.getId())
+                    .name(activity.getName())
+                    .caloriesConsume(activity.getCaloriesConsume())
+                    .userId(activity.getUserId())
+                    .status(activity.getStatus())
+                    .minutes(diaryActivity.getMinutes())
+                    .totalConsumes(activityConsume)
+                    .build();
+
+            activityResponse.add(response);
+
         }
 
-        diaryUpdateResponse.setActivityList(activityMapper.toDtoList(activityResponse));
+        diaryUpdateResponse.setActivityList(activityResponse);
         diaryUpdateResponse.setTotalConsumes(totalConsumes);
     }
 
@@ -104,7 +137,7 @@ public class DiaryService {
             updateDiaryFood(diaryId, diaryUpdatedRequest);
         }
 
-        if(diaryUpdatedRequest.getActivityId() != null) {
+        if (diaryUpdatedRequest.getActivityId() != null) {
             updateDiaryActivity(diaryId, diaryUpdatedRequest);
         }
 
@@ -179,7 +212,7 @@ public class DiaryService {
         double realProtein = 0.0;
         double realTdee = 0.0;
 
-        for(DiaryFood diaryFood : diaryFoods) {
+        for (DiaryFood diaryFood : diaryFoods) {
             Food food = foodMap.get(diaryFood.getFoodId());
             Double scale = diaryFood.getAmount() / 100;
             realCarbs += scale * food.getCarbs();
@@ -188,7 +221,7 @@ public class DiaryService {
             realTdee += scale * food.getCalories();
         }
 
-        if(actualStatistics.isEmpty()) {
+        if (actualStatistics.isEmpty()) {
             ActualStatistics statistics = ActualStatistics.builder()
                     .diaryId(diaryId)
                     .realWater(diaryUpdateRequest.getWater() == null ? 0 : 1.0 * diaryUpdateRequest.getWater())
@@ -203,9 +236,9 @@ public class DiaryService {
             ActualStatistics statistics = actualStatistics.get();
 
             Double water = 0.0;
-            if(diaryUpdateRequest.getActivityId() != null || diaryUpdateRequest.getFoodId() != null) {
+            if (diaryUpdateRequest.getActivityId() != null || diaryUpdateRequest.getFoodId() != null) {
                 water = statistics.getRealWater();
-            } else if(diaryUpdateRequest.getWater() != null){
+            } else if (diaryUpdateRequest.getWater() != null) {
                 water = 1.0 * diaryUpdateRequest.getWater();
             }
 

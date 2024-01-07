@@ -1,8 +1,6 @@
 package com.example.nutritionapp.http.response;
 
 import com.example.nutritionapp.domain.ActualStatistics;
-import com.example.nutritionapp.dto.ActivityDTO;
-import com.example.nutritionapp.dto.FoodDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,6 +15,6 @@ import java.util.List;
 public class DiaryUpdateResponse {
     private Double totalConsumes;
     private ActualStatistics statistics;
-    private List<FoodDTO> foodList;
-    private List<ActivityDTO> activityList;
+    private List<FoodResponse> foodList;
+    private List<ActivityResponse> activityList;
 }

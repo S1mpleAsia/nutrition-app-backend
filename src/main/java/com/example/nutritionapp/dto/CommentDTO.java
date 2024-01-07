@@ -17,6 +17,7 @@ public class CommentDTO {
     private UUID id;
     private UUID postId;
     private UUID commentFromUserId;
+    private String commentFromUsername;
     private String content;
     private Date createdAt;
     private Date updatedAt;

@@ -100,6 +100,13 @@ public class PostService {
         UUID userId = diaryMap.get(post.getDiaryId()).getUserId();
         String username = userMap.get(userId).getUsername();
 
+        List<CommentDTO> commentDTOList = commentList.stream().map(item -> {
+            CommentDTO dto = commentMapper.toDto(item);
+            dto.setCommentFromUsername(userMap.get(item.getCommentFromUserId()).getUsername());
+
+            return dto;
+        }).toList();
+
         PostResponse postResponse = PostResponse.builder()
                 .id(post.getId())
                 .content(post.getContent())
@@ -112,7 +119,7 @@ public class PostService {
         PostDetailResponse response = PostDetailResponse.builder()
                 .post(postResponse)
                 .interaction(postInteractionMapper.toDtoList(postInteraction))
-                .comment(commentMapper.toDtoList(commentList))
+                .comment(commentDTOList)
                 .build();
 
         return GeneralResponse.success(response);

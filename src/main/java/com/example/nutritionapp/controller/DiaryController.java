@@ -30,6 +30,11 @@ public class DiaryController {
         return diaryService.getDiaryDetail(userId, dateString);
     }
 
+    @GetMapping("detail")
+    public GeneralResponse<DiaryUpdateResponse> getDiaryDetailById(@RequestParam("diaryId") UUID diaryId) {
+        return diaryService.getDiaryDetailById(diaryId);
+    }
+
     @PutMapping("/{userId}")
     public void updateDiary(@PathVariable("userId") UUID userId, @RequestBody DiaryUpdateRequest diaryUpdatedRequest) {
         diaryService.updateDiary(userId, diaryUpdatedRequest);

@@ -265,4 +265,14 @@ public class DiaryService {
 
         return GeneralResponse.success(diaryMapper.toDto(savedDiary));
     }
+
+    public GeneralResponse<DiaryUpdateResponse> getDiaryDetailById(UUID diaryId) {
+        Optional<Diary> diary = diaryRepository.findById(diaryId);
+
+        if (diary.isEmpty()) return GeneralResponse.error("Can not find diary", null);
+
+        else {
+            return getDiaryDetail(diary.get().getUserId(), DateTransform.toString(diary.get().getDate()));
+        }
+    }
 }

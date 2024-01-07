@@ -18,4 +18,10 @@ public class DateTransform {
             return null;
         }
     }
+
+    public static String toString(Date date) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
+
+        return dateFormat.format(date);
+    }
 }

@@ -66,20 +66,40 @@ public class ActivityService {
         return GeneralResponse.success(activityMapper.toDto(insertedActivity));
     }
 
+    public GeneralResponse<ActivityDTO> publishedActivity(UUID activityId, FoodApproveRequest request) {
+        Activity activity = activityRepository.findById(activityId).orElseThrow(() -> new RuntimeException("Could not find any food"));
+
+        if(request.getStatus().equals(ActivityStatus.PENDING.name())) {
+            activity.setStatus(ActivityStatus.PENDING.name());
+            activityRepository.save(activity);
+
+            return GeneralResponse.success(activityMapper.toDto(activity));
+        } else if (request.getStatus().equals(ActivityStatus.UNPUBLISHED.name())) {
+            activity.setStatus(ActivityStatus.UNPUBLISHED.name());
+            activityRepository.save(activity);
+
+            return GeneralResponse.success(activityMapper.toDto(activity));
+        } else {
+            throw new RuntimeException("Status is invalid");
+        }
+    }
+
     public GeneralResponse<ActivityDTO> approveFood(UUID activityId, FoodApproveRequest request) {
         Activity activity = activityRepository.findById(activityId).orElseThrow(() -> new RuntimeException("Could not find any food"));
 
         if(request.getStatus().equals(ActivityStatus.PUBLISHED.name())) {
             activity.setStatus(ActivityStatus.PUBLISHED.name());
             activityRepository.save(activity);
+
+            return GeneralResponse.success(activityMapper.toDto(activity));
         } else if (request.getStatus().equals(ActivityStatus.UNPUBLISHED.name())) {
             activity.setStatus(ActivityStatus.UNPUBLISHED.name());
             activityRepository.save(activity);
+
+            return GeneralResponse.success(activityMapper.toDto(activity));
         } else {
             throw new RuntimeException("Status is invalid");
         }
-
-        return GeneralResponse.success(activityMapper.toDto(activity));
     }
 
     public void deleteActivity(UUID activityId) {
@@ -101,4 +121,6 @@ public class ActivityService {
 
         return GeneralResponse.success(activityMapper.toDto(activity));
     }
+
+
 }

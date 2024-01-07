@@ -33,6 +33,11 @@ public class ActivityController {
         return activityService.createActivity(request);
     }
 
+    @PutMapping("{activityId")
+    public GeneralResponse<ActivityDTO> publishedActivity(@PathVariable("activityId") UUID activityId, @RequestBody FoodApproveRequest request) {
+        return activityService.publishedActivity(activityId, request);
+    }
+
     @PutMapping("approve/{activityId}")
     public GeneralResponse<ActivityDTO> approveActivity(@PathVariable("activityId") UUID activityId, @RequestBody FoodApproveRequest request) {
         return activityService.approveFood(activityId, request);

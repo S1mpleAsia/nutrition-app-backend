@@ -212,6 +212,8 @@ public class PostService {
         List<PostDTO> dtoList = postMapper.toDtoList(postList);
         List<PostDTO> postDTOS = dtoList.stream().filter(item -> diaryMap.get(item.getDiaryId()).getUserId() == userId).toList();
 
+        log.info("List: [{}]", postDTOS);
+
         List<PostResponse> responses = postDTOS.stream().map(item -> {
             String username = userMap.get(userId).getUsername();
             return PostResponse.builder()

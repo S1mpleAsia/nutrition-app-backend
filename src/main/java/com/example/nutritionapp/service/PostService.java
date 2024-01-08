@@ -210,7 +210,7 @@ public class PostService {
 
         List<Post> postList = postRepository.findAll();
         List<PostDTO> dtoList = postMapper.toDtoList(postList);
-        List<PostDTO> postDTOS = dtoList.stream().filter(item -> diaryMap.get(item.getDiaryId()).getUserId() == userId).toList();
+        List<PostDTO> postDTOS = dtoList.stream().filter(item -> diaryMap.get(item.getDiaryId()).getUserId().equals(userId)).toList();
 
         log.info("List: [{}]", postDTOS);
 

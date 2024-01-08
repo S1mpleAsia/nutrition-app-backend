@@ -45,7 +45,7 @@ public class PostService {
 
     public GeneralResponse<PostDTO> createPost(PostDTO request) {
         Optional<Diary> diaryOptional = diaryRepository.findById(request.getDiaryId());
-        if(diaryOptional.isEmpty()) return GeneralResponse.error("No diary", null);
+        if (diaryOptional.isEmpty()) return GeneralResponse.error("No diary", null);
 
         Post insertedPost = postRepository.save(postMapper.toEntity(request));
 
@@ -55,8 +55,8 @@ public class PostService {
     public void updatePost(UUID postId, PostDTO request) {
         Post post = postRepository.findById(postId).orElseThrow(() -> new RuntimeException("No post"));
 
-        if(request.getContent() != null) post.setContent(request.getContent());
-        if(request.getImage() != null) post.setImage(request.getImage());
+        if (request.getContent() != null) post.setContent(request.getContent());
+        if (request.getImage() != null) post.setImage(request.getImage());
 
         postRepository.save(post);
     }
@@ -153,7 +153,7 @@ public class PostService {
         Optional<PostInteraction> postInteraction = postInteractionRepository.findFirstByFromUserIdAndPostId(
                 request.getUserId(), request.getPostId());
 
-        if(postInteraction.isEmpty()) {
+        if (postInteraction.isEmpty()) {
             PostInteraction interaction = PostInteraction.builder()
                     .fromUserId(request.getUserId())
                     .postId(request.getPostId())
@@ -169,7 +169,7 @@ public class PostService {
     public void updateComment(UUID commentId, CommentDTO request) {
         Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new RuntimeException("No Comment"));
 
-        if(request.getContent() != null) comment.setContent(request.getContent());
+        if (request.getContent() != null) comment.setContent(request.getContent());
 
         commentRepository.save(comment);
     }
@@ -200,5 +200,33 @@ public class PostService {
         List<Report> reportList = reportRepository.findAll();
 
         return GeneralListResponse.success(reportMapper.toDtoList(reportList));
+    }
+
+    public GeneralListResponse<PostResponse> getPersonalPostList(UUID userId) {
+        List<User> userList = userRepository.findAll();
+        List<Diary> diaryList = diaryRepository.findAll();
+        Map<UUID, Diary> diaryMap = diaryList.stream().collect(Collectors.toMap(Diary::getId, Function.identity()));
+        Map<UUID, User> userMap = userList.stream().collect(Collectors.toMap(User::getId, Function.identity()));
+
+        List<Post> postList = postRepository.findAll();
+        List<PostDTO> dtoList = postMapper.toDtoList(postList);
+
+        List<PostResponse> responses = dtoList.stream().filter(item -> {
+            UUID realUserId = diaryMap.get(item.getDiaryId()).getUserId();
+
+            return realUserId == userId;
+        }).map(item -> {
+            String username = userMap.get(userId).getUsername();
+            return PostResponse.builder()
+                    .id(item.getId())
+                    .content(item.getContent())
+                    .image(item.getImage())
+                    .diaryId(item.getDiaryId())
+                    .userId(userId)
+                    .username(username)
+                    .build();
+        }).toList();
+
+        return GeneralListResponse.success(responses);
     }
 }

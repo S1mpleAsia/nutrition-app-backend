@@ -80,4 +80,9 @@ public class PostController {
     public GeneralListResponse<ReportDTO> getReportList() {
         return postService.getReportList();
     }
+
+    @GetMapping("/personal/{userId}")
+    public GeneralListResponse<PostResponse> getPersonalPostList(@PathVariable("userId") UUID userId) {
+        return postService.getPersonalPostList(userId);
+    }
 }

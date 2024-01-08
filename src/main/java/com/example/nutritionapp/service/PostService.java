@@ -214,6 +214,9 @@ public class PostService {
         List<PostResponse> responses = dtoList.stream().filter(item -> {
             UUID realUserId = diaryMap.get(item.getDiaryId()).getUserId();
 
+            log.info("Real UserID: [{}]",realUserId);
+            log.info("UserID: [{}]", userId);
+
             return realUserId == userId;
         }).map(item -> {
             String username = userMap.get(userId).getUsername();
